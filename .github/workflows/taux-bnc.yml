@@ -2,9 +2,11 @@ name: Taux BNC
 
 on:
   schedule:
-    # Du lundi au samedi, plusieurs fois dans la matinée et le début d'après-midi (heure UTC).
-    # En hiver, Haïti est à UTC-5 : 13 h 15 UTC = 8 h 15 à Port-au-Prince.
-    - cron: '15 13,14,15,17,20 * * 1-6'
+    # Du lundi au samedi (heure UTC ; en hiver, Haïti est à UTC-5 : 12 h 17 UTC = 7 h 17 à Port-au-Prince).
+    # Le matin toutes les 30 minutes de 7 h 17 à 11 h 47, puis à 12 h 17, 14 h 17 et 16 h 17 (heure d'Haïti).
+    # GitHub ne garantit pas chaque passage : plusieurs passages assurent la lecture. Le robot n'écrit que si le taux change.
+    - cron: '17,47 12-16 * * 1-6'
+    - cron: '17 17,19,21 * * 1-6'
   workflow_dispatch:
 
 permissions:
