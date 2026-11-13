@@ -1,0 +1,36 @@
+name: Taux BNC
+
+on:
+  schedule:
+    # Du lundi au samedi, plusieurs fois dans la matinée et le début d'après-midi (heure UTC).
+    # En hiver, Haïti est à UTC-5 : 13 h 15 UTC = 8 h 15 à Port-au-Prince.
+    - cron: '15 13,14,15,17,20 * * 1-6'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: taux-bnc
+  cancel-in-progress: false
+
+jobs:
+  lire:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Lire le taux de la BNC
+        run: node lire-taux-bnc.mjs
+      - name: Enregistrer le nouveau taux
+        run: |
+          if [ -n "$(git status --porcelain -- taux-bnc.json historique.csv)" ]; then
+            git config user.name "robot-taux"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add taux-bnc.json historique.csv
+            git commit -m "Taux BNC du $(node -p "require('./taux-bnc.json').date")"
+            git push
+          fi
